@@ -1,0 +1,31 @@
+# golangci-lint v2 configuration — the aggregate `lint` step of the gate.
+# Builds on the standard linter set with correctness- and security-focused
+# additions. Run via `go tool golangci-lint run` (see the Makefile `lint` target).
+version: "2"
+
+run:
+  timeout: 5m
+  allow-parallel-runners: true
+
+linters:
+  default: standard
+  enable:
+    - errorlint   # error wrapping/comparison correctness (errors.Is over ==)
+    - gocognit    # cognitive complexity — capped at 7 by the gomatic standard
+    - gosec       # security analysis — robustness for service code
+    - misspell    # spelling in comments and strings
+    - unconvert   # redundant type conversions
+    - bodyclose   # HTTP response bodies are closed
+    - nilerr      # returning nil where a non-nil error is expected
+  settings:
+    gocognit:
+      min-complexity: 7
+  exclusions:
+    rules:
+      # Test files get a lighter touch (matches gomatic/template.cli): the
+      # complexity gate is scoped to production code, so gocognit and gosec
+      # do not apply to *_test.go.
+      - path: _test\.go
+        linters:
+          - gocognit
+          - gosec
