@@ -1,15 +1,22 @@
 # Self-documenting quality gate for the gloo integration-test module. Run
 # `make` (or `make help`).
 #
-# Every tool is declared in the go.mod `tool` stanza and invoked via `go tool`,
-# so there are no global installs and versions are pinned in go.mod/go.sum. This
-# module is test-only (no production statements to cover, no binary to release),
-# so the gate omits the coverage and goreleaser steps: `check` is format, vet,
-# lint, staticcheck, complexity<=7, vuln, and the race-enabled tests. No change
-# is complete until it exits zero.
+# Every tool is resolved from $GOBIN (the centrally pinned tool set installed by
+# `make tools` in nicerobot/tools.repository), never from a go.mod `tool` stanza
+# and never via `go tool` — keeping the tools' transitive CVE graph out of this
+# module's go.sum. This module is test-only (no production statements to cover,
+# no binary to release), so the gate omits the coverage and goreleaser steps:
+# `check` is format, vet, lint, staticcheck, complexity<=7, vuln, and the
+# race-enabled tests. No change is complete until it exits zero.
 .DEFAULT_GOAL := check
 
 GO ?= go
+# Resolve quality tooling from $GOBIN only (falling back to $GOPATH/bin).
+GOBIN ?= $(shell $(GO) env GOBIN)
+ifeq ($(strip $(GOBIN)),)
+GOBIN := $(shell $(GO) env GOPATH)/bin
+endif
+TOOLBIN := $(GOBIN)/
 # Production (non-test) Go files — the cognitive-complexity gate runs over these.
 SRC := $(shell find . -name '*.go' -not -name '*_test.go' -not -path './vendor/*')
 
@@ -25,11 +32,11 @@ check: fmt-check vet lint staticcheck cognit vuln test ## Full gate: format, vet
 
 .PHONY: fmt
 fmt: ## Rewrite all files with the strict formatter (gofumpt)
-	$(GO) tool gofumpt -w .
+	$(TOOLBIN)gofumpt -w .
 
 .PHONY: fmt-check
 fmt-check: ## Fail if any file is not gofumpt-clean
-	@out="$$($(GO) tool gofumpt -l .)"; \
+	@out="$$($(TOOLBIN)gofumpt -l .)"; \
 	if [ -n "$$out" ]; then echo "gofumpt would reformat:"; echo "$$out"; exit 1; fi
 
 .PHONY: vet
@@ -38,20 +45,20 @@ vet: ## Run go vet
 
 .PHONY: lint
 lint: ## Run golangci-lint aggregate analysis
-	$(GO) tool golangci-lint run
+	$(TOOLBIN)golangci-lint run
 
 .PHONY: staticcheck
 staticcheck: ## Run staticcheck (zero findings)
-	$(GO) tool staticcheck ./...
+	$(TOOLBIN)staticcheck ./...
 
 .PHONY: cognit
 cognit: ## Assert cognitive complexity <= 7 for every production function
-	@out="$$($(GO) tool gocognit -over 7 $(SRC))"; \
+	@out="$$($(TOOLBIN)gocognit -over 7 $(SRC))"; \
 	if [ -n "$$out" ]; then echo "cognitive complexity > 7:"; echo "$$out"; exit 1; fi
 
 .PHONY: vuln
 vuln: ## Scan for known vulnerabilities
-	$(GO) tool govulncheck ./...
+	$(TOOLBIN)govulncheck ./...
 
 .PHONY: test
 test: ## Run the integration tests under the race detector
