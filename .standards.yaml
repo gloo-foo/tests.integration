@@ -1,0 +1,7 @@
+# This repo opts out of the shared Go Makefile artifact: its build is bespoke (or
+# the repo is not primarily Go), so `distribute --adopt` must not clobber it with
+# the shared-gate Makefile. Remove this entry (and adopt the artifact) if the repo
+# is migrated to the shared Makefile + Makefile.local; `git repo standards verify`
+# and the gate ratchet enforce that exemptions shrink toward zero.
+exempt:
+  artifact:makefile: "bespoke integration-test gate; pending migration off the go.mod tool stanza to the shared Makefile"
