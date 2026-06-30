@@ -4,4 +4,4 @@
 # is migrated to the shared Makefile + Makefile.local; `git repo standards verify`
 # and the gate ratchet enforce that exemptions shrink toward zero.
 exempt:
-  artifact:makefile: "bespoke integration-test gate; pending migration off the go.mod tool stanza to the shared Makefile"
+  artifact:makefile: "bespoke test-only integration gate (GOBIN-resolved tools, no goreleaser/coverage steps by design); not the shared go-build Makefile"
