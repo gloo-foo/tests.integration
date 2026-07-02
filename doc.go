@@ -7,7 +7,8 @@
 //   - Stateful commands (patterns.StatefulMap/StatefulFilter) get fresh state
 //     per Execute, so a reused value never leaks state across goroutines.
 //
-// Run the race detector to validate those guarantees:
+// The tests carry the "integration" build tag (they are cross-cutting, not
+// 1:1 unit tests). Run the race detector to validate those guarantees:
 //
-//	go test -race ./tests.integration/
+//	go test -race -tags integration ./tests.integration/
 package integration

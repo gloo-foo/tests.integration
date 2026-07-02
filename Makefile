@@ -11,6 +11,10 @@
 .DEFAULT_GOAL := check
 
 GO ?= go
+# The integration tests carry the "integration" build tag (they are
+# cross-cutting, not 1:1 unit tests); every Go-analyzing gate step passes the
+# tag so the test files stay inside the gate.
+GOTAGS := integration
 # Resolve quality tooling from $GOBIN only (falling back to $GOPATH/bin).
 GOBIN ?= $(shell $(GO) env GOBIN)
 ifeq ($(strip $(GOBIN)),)
@@ -41,15 +45,15 @@ fmt-check: ## Fail if any file is not gofumpt-clean
 
 .PHONY: vet
 vet: ## Run go vet
-	$(GO) vet ./...
+	$(GO) vet -tags $(GOTAGS) ./...
 
 .PHONY: lint
 lint: ## Run golangci-lint aggregate analysis
-	$(TOOLBIN)golangci-lint run
+	$(TOOLBIN)golangci-lint run --build-tags $(GOTAGS)
 
 .PHONY: staticcheck
 staticcheck: ## Run staticcheck (zero findings)
-	$(TOOLBIN)staticcheck ./...
+	$(TOOLBIN)staticcheck -tags $(GOTAGS) ./...
 
 .PHONY: cognit
 cognit: ## Assert cognitive complexity <= 7 for every production function
@@ -58,11 +62,11 @@ cognit: ## Assert cognitive complexity <= 7 for every production function
 
 .PHONY: vuln
 vuln: ## Scan for known vulnerabilities
-	$(TOOLBIN)govulncheck ./...
+	$(TOOLBIN)govulncheck -tags $(GOTAGS) ./...
 
 .PHONY: test
 test: ## Run the integration tests under the race detector
-	$(GO) test -race ./...
+	$(GO) test -race -tags $(GOTAGS) ./...
 
 ## Utilities
 
