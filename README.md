@@ -1,5 +1,3 @@
-# tests.integration
+[![actions](https://github.com/gloo-foo/tests.integration/actions/workflows/actions.yml/badge.svg)](https://github.com/gloo-foo/tests.integration/actions/workflows/actions.yml) [![ci](https://github.com/gloo-foo/tests.integration/actions/workflows/ci.yml/badge.svg)](https://github.com/gloo-foo/tests.integration/actions/workflows/ci.yml) [![docs](https://github.com/gloo-foo/tests.integration/actions/workflows/docs.yml/badge.svg)](https://github.com/gloo-foo/tests.integration/actions/workflows/docs.yml) [![go](https://github.com/gloo-foo/tests.integration/actions/workflows/go.yml/badge.svg)](https://github.com/gloo-foo/tests.integration/actions/workflows/go.yml)
 
-[![CI](https://github.com/gloo-foo/tests.integration/actions/workflows/ci.yml/badge.svg)](https://github.com/gloo-foo/tests.integration/actions/workflows/ci.yml)
-[![Go Reference](https://pkg.go.dev/badge/github.com/gloo-foo/tests.integration.svg)](https://pkg.go.dev/github.com/gloo-foo/tests.integration)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[docs](https://gloo-foo.github.io/docs.tests.integration/)
